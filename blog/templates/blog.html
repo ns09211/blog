@@ -1,0 +1,99 @@
+{% extends "basic.html" %}
+{% block title %}blogpost {% endblock %}
+{% block blogactive %} active{% endblock blogactive %}
+{% block body %}
+{% load humanize %}
+{% load get_val %}
+
+
+<div class="container">
+
+<div class="blog-post">
+        <h2 class="blog-post-title">{{post.title}}</h2>
+        <p class="blog-post-meta">{{post.timestamp}} <a href="/blog/about">{{post.author}}</a> <span> &nbsp {{post.views}} Views</span>  </p>
+
+    <p>{{post.content|safe}} </p>
+      </div>
+    </div>
+
+<div class="container">
+    <h4>Comments ({{comments.count}})</h4>
+    <form method="post" action="/blog/comment/"> {% csrf_token %}
+
+        {% if user.is_authenticated %}
+  <div class="form-group">
+    <label for="comment">Enter Your Comment:</label>
+    <input type="text" class="form-control" id="comment" name="comment" >
+      <input type="hidden" class="form-control" id="postSno" name="postSno" value="{{post.sno}}" >
+      <input type="hidden" class="form-control" name="parentSno"  value=" " >
+
+  </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      {% else %}
+      Please login to comment
+      {% endif %}
+</form>
+
+    <br>
+    {% for comment in comments %}
+
+    <div class="row my-3">
+        <div class="col-md-2 ">
+        <img class="rounded mx-auto d-block w-50 p-1 border border-dark" src="/static/user.png">
+
+        </div>
+
+        <div class="col-md-10"><b>{{comment.user}}</b>  <span class="badge badge-secondary">{{comment.time|naturaltime}}</span>
+        <div>{{comment.comment}}</div>
+            <div class="reply mx-0">
+                {% if user.is_authenticated %}
+    <button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#reply{{comment.sno}}" aria-expanded="false" aria-controls="collapseExample">
+    Reply
+  </button>
+
+            <div class="collapse" id="reply{{comment.sno}}">
+                <div class="card card-body my-2">
+    <form method="post" action="/blog/comment/"> {% csrf_token %}
+   <div class="form-group">
+    <label for="comment">Reply</label>
+
+    <input type="text" class="form-control" id="comment" name="comment" >
+
+       <input type="hidden" class="form-control" name="parentSno"  value="{{comment.sno}}" > </div>
+
+        <input type="hidden" class="form-control" name="postSno"  value="{{post.sno}}" >
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% else %}
+            <button type="text" class="btn btn-sm btn-primary"> login for reply</button>
+         {% endif %}
+                <div class="replies  my-2">
+                    {% for reply in replydict|get_val:comment.sno %}
+                    <div class="row">
+                        <div class="col-md-1 my-2">
+                            <img class="rounded mx-auto d-block w-100 p-1 border border-dark" src="/static/user.png">
+                        </div>
+                        <div class="col-md-11"><b>{{reply.user}}</b>  <span class="badge badge-secondary">{{reply.time|naturaltime}}</span>
+                            <div>{{reply.comment}}</div>
+                        </div>
+                    </div>
+
+
+
+                    {% endfor %}
+                </div>
+
+        </div>
+
+</div>
+</div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

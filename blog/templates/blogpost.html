@@ -1,0 +1,21 @@
+{% extends "basic.html" %}
+{% block title %}blogpost {% endblock %}
+{% block blogactive %} active{% endblock blogactive %}
+{% block body %}
+
+{% for post in posts %}
+<div class="container">
+
+<div class="col p-4 d-flex flex-column position-static">
+          <strong class="d-inline-block mb-2 text-primary">{{post.author}}</strong>
+          <h3 class="mb-0">{{post.title}}</h3>
+          <div class="mb-1 text-muted">{{post.timestamp}} (<span>{{post.views}} Views</span>)</div>
+          <p class="card-text mb-auto">{{post.content|safe|truncatechars:250}}</p>
+          <a href="/blog/{{post.slug}}" role="button" >Continue reading</a>
+        </div>
+
+    </div>
+
+
+    {% endfor %}
+{% endblock %}
